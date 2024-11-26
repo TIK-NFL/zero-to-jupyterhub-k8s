@@ -180,6 +180,9 @@ singleuser:
         memory: 0
         cpu: 0
 
+  image:
+    name: jupyterhub/singleuser
+    tag: 4.0.0-beta.1-dev
   extraEnv:
     TEST_ENV_FIELDREF_TO_NAMESPACE:
       valueFrom:
