@@ -51,7 +51,7 @@ jobs:
         shell: python
         run: |
           import os
-          repo = "${{ github.repository }}"
+          repo = "${{ github.repository }}".lower()
           event = "${{ github.event_name }}"
           ref = "${{ github.event.ref }}"
           publishing = ""
