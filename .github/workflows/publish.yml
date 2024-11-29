@@ -56,7 +56,7 @@ jobs:
           ref = "${{ github.event.ref }}"
           publishing = ""
           if (
-              repo == "jupyterhub/zero-to-jupyterhub-k8s"
+              repo == "tik-nfl/zero-to-jupyterhub-k8s"
               and event == "push"
               and (
                   ref.startswith("refs/tags/")
