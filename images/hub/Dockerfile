@@ -21,6 +21,8 @@ FROM python:3.12-bookworm as build-stage
 COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
+    # wheel setuptools required to build and install python packages from git repositories
+    pip wheel --wheel-dir=/tmp/wheels setuptools && \
     pip wheel \
         --wheel-dir=/tmp/wheels \
         # pycurl 7.45.3 has wheels, but they aren't portable
@@ -62,6 +64,7 @@ RUN apt-get update \
         # requirement for using a local sqlite database
         sqlite3 \
         tini \
+        git \
  && rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage

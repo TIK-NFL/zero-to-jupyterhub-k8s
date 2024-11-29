@@ -504,3 +504,102 @@ if os.path.isdir(config_dir):
 for key, config_py in sorted(get_config("hub.extraConfig", {}).items()):
     print(f"Loading extra config: {key}")
     exec(config_py)
+
+
+# ======================================================================================================================
+# ============================================= LTI provider config ====================================================
+# ======================================================================================================================
+
+import os
+from importlib import import_module
+
+from tornado.web import HTTPError
+
+from z2jh import get_config
+
+# ======================================================================================================================
+# General config
+#
+
+c.JupyterHub.shutdown_on_logout = True
+
+# ======================================================================================================================
+# Spawner config
+#
+
+c.KubeSpawner.notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR', '/home/jovyan')
+c.KubeSpawner.pod_name_template = 'jupyter-{escaped_username}'
+c.KubeSpawner.delete_stopped_pods = True
+
+
+# ======================================================================================================================
+# Authenticator
+#
+
+c.Authenticator.any_allow_config = True
+c.Authenticator.allow_all = True
+
+authenticator_modules = {
+    'CILogonOAuthenticator': 'oauthenticator',
+    'GitHubOAuthenticator': 'oauthenticator',
+    'GoogleOAuthenticator': 'oauthenticator',
+    'Auth0OAuthenticator': 'oauthenticator.auth0',
+    'AzureAdOAuthenticator': 'oauthenticator.azuread',
+    'GenericOAuthenticator': 'oauthenticator.generic',
+    'GlobusOAuthenticator': 'oauthenticator.globus',
+    'DummyAuthenticator': 'jupyterhub.auth',
+    'LTI13Authenticator': 'ltiauthenticator.lti13.auth',
+}
+
+for scope, auth in get_config("hub.config.MultiAuthenticator", []).items():
+    for cls_name in auth.keys():
+        # dynamic import of authenticators requested by the config
+        module = import_module(authenticator_modules[cls_name])
+        cls = getattr(module, cls_name)
+        c.MultiAuthenticator.authenticators.append((cls, scope, auth[cls_name]))
+
+
+########################################################################################################################
+def auth_state_spawner_hook(spawner, auth_state):
+    if not auth_state:
+        return
+
+    # Data extraction
+    roles_data_list = auth_state['https://purl.imsglobal.org/spec/lti/claim/roles']
+    tool_platform_data = auth_state['https://purl.imsglobal.org/spec/lti/claim/tool_platform']
+    context_data = auth_state['https://purl.imsglobal.org/spec/lti/claim/context']
+    resource_link_data = auth_state['https://purl.imsglobal.org/spec/lti/claim/resource_link']
+    custom_data = auth_state.get("https://purl.imsglobal.org/spec/lti/claim/custom", {})
+
+    username = spawner.template_namespace().get('username')
+    client_id = auth_state['aud']
+    platform_id = tool_platform_data['guid']
+    course_id = context_data['id']
+    link_id = resource_link_data['id']
+
+    # Determine instructor access
+    instructor_access = False
+    for r in roles_data_list:
+        if str(r.split('#')[-1]).lower() in ['administrator', 'instructor']:
+            instructor_access = True
+
+    # if ('ONLINE' not in custom_data or custom_data['ONLINE'].lower() != 'true') and not instructor_access:
+    #     # The LTI object is not online for students. Abort spawning.
+    #     raise HTTPError(500, reason="LTI object resources are offline. "
+    #                                 "Please contact your instructor or course administrator.")
+
+    if instructor_access:
+        spawner.notebook_dir = '/home/jovyan/'
+        spawner.environment['INSTRUCTOR_ACCESS'] = 'true'
+
+    #
+    # Determine further LTI parameters
+    #
+    submission_mode = 'SUBMISSION_MODE' in custom_data and custom_data['SUBMISSION_MODE'].lower() == 'true'
+    spawner.environment['SUBMISSION_MODE'] = str(submission_mode).lower()
+
+    local_copy = 'LOCAL_COPY' in custom_data and custom_data['LOCAL_COPY'].lower() == 'true'
+    spawner.environment['LOCAL_COPY'] = str(local_copy).lower()
+
+
+c.KubeSpawner.auth_state_hook = auth_state_spawner_hook
