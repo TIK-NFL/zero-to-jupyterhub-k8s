@@ -594,10 +594,15 @@ def auth_state_spawner_hook(spawner, auth_state):
     #
     # Determine further LTI parameters
     #
-    submission_mode = "SUBMISSION_MODE" in custom_data and custom_data["SUBMISSION_MODE"].lower() == "true"
+    submission_mode = (
+        "SUBMISSION_MODE" in custom_data
+        and custom_data["SUBMISSION_MODE"].lower() == "true"
+    )
     spawner.environment["SUBMISSION_MODE"] = str(submission_mode).lower()
 
-    local_copy = "LOCAL_COPY" in custom_data and custom_data["LOCAL_COPY"].lower() == "true"
+    local_copy = (
+        "LOCAL_COPY" in custom_data and custom_data["LOCAL_COPY"].lower() == "true"
+    )
     spawner.environment["LOCAL_COPY"] = str(local_copy).lower()
 
 
