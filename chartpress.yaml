@@ -20,7 +20,7 @@ charts:
     #
     # baseVersion should be managed via tbump, see RELEASE.md for details
     #
-    baseVersion: "4.0.3-0.dev"
+    baseVersion: "4.0.4-0.dev"
     repo:
       git: tik-nfl/jupyterhub-helm-chart
       published: https://tik-nfl.github.io/jupyterhub-helm-chart
