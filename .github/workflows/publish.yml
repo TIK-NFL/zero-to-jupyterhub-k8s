@@ -55,6 +55,7 @@ jobs:
           event = "${{ github.event_name }}"
           ref = "${{ github.event.ref }}"
           publishing = ""
+          print(f"Decide to publish or not for '{repo}' on '{event}' at ref '{ref}'...")
           if (
               repo == "tik-nfl/zero-to-jupyterhub-k8s"
               and event == "push"
