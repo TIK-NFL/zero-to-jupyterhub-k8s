@@ -84,7 +84,7 @@ hub:
   extraVolumes: []
   extraVolumeMounts: []
   image:
-    name: quay.io/jupyterhub/k8s-hub
+    name: ghcr.io/tik-nfl/z2jh-hub
     tag: "set-by-chartpress"
     pullPolicy:
     pullSecrets: []
@@ -325,7 +325,7 @@ proxy:
       seccompProfile:
         type: "RuntimeDefault"
     image:
-      name: quay.io/jupyterhub/k8s-secret-sync
+      name: ghcr.io/tik-nfl/z2jh-secret-sync
       tag: "set-by-chartpress"
       pullPolicy:
       pullSecrets: []
@@ -365,7 +365,7 @@ singleuser:
     preferred: []
   networkTools:
     image:
-      name: quay.io/jupyterhub/k8s-network-tools
+      name: ghcr.io/tik-nfl/z2jh-network-tools
       tag: "set-by-chartpress"
       pullPolicy:
       pullSecrets: []
@@ -418,7 +418,7 @@ singleuser:
       storageAccessModes: [ReadWriteOnce]
       subPath:
   image:
-    name: quay.io/jupyterhub/k8s-singleuser-sample
+    name: ghcr.io/tik-nfl/z2jh-singleuser-sample
     tag: "set-by-chartpress"
     pullPolicy:
     pullSecrets: []
@@ -647,7 +647,7 @@ prePuller:
     pullOnlyOnChanges: true
     # image and the configuration below relates to the hook-image-awaiter Job
     image:
-      name: quay.io/jupyterhub/k8s-image-awaiter
+      name: ghcr.io/tik-nfl/z2jh-image-awaiter
       tag: "set-by-chartpress"
       pullPolicy:
       pullSecrets: []
