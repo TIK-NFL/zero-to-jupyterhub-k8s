@@ -551,7 +551,7 @@ authenticator_modules = {
     'LTI13Authenticator': 'ltiauthenticator.lti13.auth',
 }
 
-for scope, auth in get_config("hub.config.MultiAuthenticator", []).items():
+for scope, auth in get_config("hub.config.MultiAuthenticator", {}).items():
     for cls_name in auth.keys():
         # dynamic import of authenticators requested by the config
         module = import_module(authenticator_modules[cls_name])
