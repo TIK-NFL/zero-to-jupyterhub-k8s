@@ -21,6 +21,11 @@ jupyterhub-ltiauthenticator==1.*
 jupyterhub-nativeauthenticator==1.*
 jupyterhub-tmpauthenticator==1.*
 oauthenticator[googlegroups,mediawiki]==17.*
+git+https://github.com/TIK-NFL/jupyterhub-ltiauthenticator.git@multiauth_support
+git+https://github.com/TIK-NFL/jupyterhub-multiauthenticator.git@lti_support
+
+## Build tools
+hatchling
 
 # JupyterHub service shutting servers after a period of inactivity
 jupyterhub-idle-culler==1.*
